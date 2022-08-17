@@ -1,0 +1,17 @@
+### IDE ###
+.idea
+
+### Python ###
+__pycache__/
+*.pyc
+
+### VENV ###
+venv/
+
+### sqlte3 DB files ###\
+*.db
+
+### Other app files ###
+data/
+.env
+errors.txt
