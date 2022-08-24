@@ -28,3 +28,6 @@ TELEMETRON_LOGIN = os.getenv('TELEMETRON_LOGIN', default='client_login')
 TELEMETRON_SCOPE = os.getenv('TELEMETRON_SCOPE', default='teleport')
 
 # SQLITE3_DATABASE_FILE = os.path.join(BASE_DIR, 'sqlite3.db')
+
+# Настройки бота Telegram
+TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')

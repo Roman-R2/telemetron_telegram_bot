@@ -57,12 +57,7 @@ class TelemetronRequests:
         self.__component_parser()
         # Спарсим полученный список автоматов
         self.__vending_machines_parser()
-        # print('vending_machines')
-        # pprint(self.vending_machines)
-        # print('components')
-        # pprint(self.components)
-        # pprint(self.__get_planogram())
-        # self.__get_vending_machine_components_capacity()
+
         self.union_of_capacity_and_loading = self.__get_union_of_capacity_and_loading()
 
     def __get_authorization(self):
@@ -104,7 +99,6 @@ class TelemetronRequests:
             component_dict.update({
                 item['id']: (item['name'], item['units'])
             })
-        # pprint(component_dict)
         self.components = component_dict
         LOGGER.debug(
             f'{__name__}: Преобразовали данные от сервера: {component_dict}'
@@ -156,11 +150,6 @@ class TelemetronRequests:
         """ Текущий уровень загрузки торгового автомата ингредиентами. """
         url = f'https://api.telemetron.net/v2/vending_machines/{vending_machine_id}/loading'
         response = self.__send_get_request(url)
-        # print(f'Загрузка автомата id {vending_machine_id}:')
-        # for item in response.json():
-        #     print(
-        #         f'\t{self.components[item["component_id"]][0]} загружен {item["value"]} {self.components[item["component_id"]][1]}'
-        #     )
         return response.json()
 
     def __get_components(self):
@@ -176,38 +165,16 @@ class TelemetronRequests:
         response = self.__send_get_request(url)
         return response.json()['capacity']
 
-    # def __get_vending_machine_components_capacity(self,
-    #                                               vending_machine_id=24689):
-    #     """ Получит и вернет максимальную вместимость ингредиентов
-    #     в планограме по выбранному автомату. """
-    #
-    #     # print(
-    #     #     f'{__name__}Для автомата {self.vending_machines[vending_machine_id][0]}')
-    #     # pprint(self.__get_planogram_capacity(
-    #     #     planogram_id=self.vending_machines[vending_machine_id][1]
-    #     # ))
-    #     return self.__get_planogram_capacity(
-    #         planogram_id=self.vending_machines[vending_machine_id][1]
-    #     )
-
     def __get_union_of_capacity_and_loading(self):
         """ Объедини данные по вместимости ингредиентов и текущей загрузки """
         union_ingredients_data = []
         for vending_machine_id in self.vending_machines.keys():
-            # print(
-            #     f'{__name__}Для автомата {self.vending_machines[vending_machine_id][0]}'
-            # )
             planogram_capacity = self.__get_planogram_capacity(
                 planogram_id=self.vending_machines[vending_machine_id][1]
             )
-            # print('planogram_capacity=')
-            # pprint(planogram_capacity)
             vending_machine_loading = self.__get_vending_machine_loading(
                 vending_machine_id=vending_machine_id
             )
-            # print('vending_machine_loading=')
-            # pprint(vending_machine_loading)
-            # print('-'*70)
             capacity_data = []
             for capacity in planogram_capacity:
                 for loading in vending_machine_loading:
@@ -237,9 +204,9 @@ class TelemetronRequests:
 
     def how_ingredients_must_have(self):
         """ Отобразит данные о том, какие ингредиенты нужны в данный момент. """
-
+        compile_string = ''
         for item in self.union_of_capacity_and_loading:
-            print('---> ', item['name'])
+            compile_string += f'{item["name"]}:\n'
             for ingredient in item['data']:
                 component_name = ingredient["component_name"]
                 loading_value = ingredient["loading_value"]
@@ -256,22 +223,22 @@ class TelemetronRequests:
                 if component_sizing == 'мл':
                     how_many_need = diff_component // 5000
                     component_sizing = 'шт'
+                if how_many_need != 0:
+                    compile_string += f'\t{component_name}: {how_many_need} {component_sizing}\n'
 
-                print(
-                    f'\t{component_name}: {how_many_need} {component_sizing}'
-                )
-
-            print('-' * 70)
+            compile_string += f"{'-' * 10}\n"
+        return compile_string
 
     def show_ingredients(self):
         """ Отобразит данные о загрузке ингредиентов. """
+        compile_string = ""
         for item in self.union_of_capacity_and_loading:
-            print('---> ', item['name'])
+            compile_string += f"{item['name']}\n"
             for ingredient in item['data']:
-                print(
-                    f'{ingredient["component_name"]}: {ingredient["loading_value"]}/{ingredient["capacity_value"]} {ingredient["component_sizing"]}'
-                )
-            print('-' * 70)
+                compile_string += f'{ingredient["component_name"]}: {ingredient["loading_value"]}/{ingredient["capacity_value"]} {ingredient["component_sizing"]}\n'
+            compile_string += f"{'-' * 10}\n"
+
+        return compile_string
 
 
 if __name__ == "__main__":
