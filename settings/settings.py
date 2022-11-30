@@ -8,13 +8,15 @@ from dotenv import load_dotenv
 # Корневая директория проекта
 BASE_DIR = Path(__file__).parent.parent
 
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+
 # Общий уровень логирования
 LOGGING_LEVEL = logging.DEBUG
+LOG_FOLDER = os.path.join(BASE_DIR, r'logs')
+EVENT_LOG_FILE = os.path.join(LOG_FOLDER, 'server.log')
 
 # Общая кодировка проекта
 ENCODING = 'utf-8'
-
-load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Настройки доступа к Telemetron Api
 TELEMETRON_CLIENT_ID = os.getenv('TELEMETRON_CLIENT_ID', default='client_id')
@@ -26,8 +28,6 @@ TELEMETRON_PASSWORD = os.getenv('TELEMETRON_PASSWORD',
                                 default='client_password')
 TELEMETRON_LOGIN = os.getenv('TELEMETRON_LOGIN', default='client_login')
 TELEMETRON_SCOPE = os.getenv('TELEMETRON_SCOPE', default='teleport')
-
-# SQLITE3_DATABASE_FILE = os.path.join(BASE_DIR, 'sqlite3.db')
 
 # Настройки бота Telegram
 TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')

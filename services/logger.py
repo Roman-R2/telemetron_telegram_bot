@@ -1,4 +1,3 @@
-import os
 import logging
 import logging.handlers
 import sys
@@ -11,10 +10,7 @@ class GetLogger:
 
     logger_format = '%(asctime)s %(levelname)s %(filename)s %(message)s'
 
-    logger_dir = os.path.join(
-        settings.BASE_DIR,
-        r'logs\server.log'
-    )
+    logger_file = settings.EVENT_LOG_FILE
 
     def __init__(self, logger_name='server'):
         # Создаём формировщик логов (formatter):
@@ -44,7 +40,7 @@ class GetLogger:
         :return:
         """
         log_file = logging.handlers.TimedRotatingFileHandler(
-            self.logger_dir,
+            self.logger_file,
             encoding=settings.ENCODING,
             interval=interval_value,
             when=interval_period
@@ -55,7 +51,7 @@ class GetLogger:
     def _get_simple_file_handler(self):
         """ Регистрация логирования в виде простого файла. """
         log_file = logging.FileHandler(
-            self.logger_dir,
+            self.logger_file,
             encoding=settings.ENCODING
         )
         log_file.setFormatter(self.server_formatter)

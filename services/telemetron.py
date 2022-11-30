@@ -3,17 +3,11 @@ https://api.telemetron.net/docs/
 
 """
 import logging
-import math
-from pprint import pprint
 
 import requests
 
 from services import status
 from settings import settings
-
-from requests.exceptions import ConnectionError
-
-import logging_config
 
 # Инициализация логирования сервера.
 LOGGER = logging.getLogger('server_logger')
@@ -25,8 +19,8 @@ def check_request(func):
             return func(*args, **kwargs)
         except requests.exceptions.ConnectionError:
             LOGGER.error(
-                f'Нет соединения с сервером телеметрон. Проверьте соединение.'
-                f'requests.exceptions.ConnectionError.'
+                'Нет соединения с сервером телеметрон. Проверьте соединение.'
+                'requests.exceptions.ConnectionError.'
             )
             exit(777)
             return None
@@ -84,6 +78,7 @@ class TelemetronRequests:
                 self.expires_in = response_dict['expires_in']
                 self.access_token = response_dict['access_token']
                 self.refresh_token = response_dict['refresh_token']
+
                 self.headers.update(
                     {"Authorization": f"Bearer {self.access_token}"})
                 LOGGER.debug(
@@ -217,16 +212,18 @@ class TelemetronRequests:
 
                 if component_sizing == 'гр':
                     how_many_need = diff_component // 700
-                    component_sizing = 'шт'
+                    # component_sizing = 'шт'
                 if component_sizing == 'шт':
                     how_many_need = diff_component // 80
                 if component_sizing == 'мл':
                     how_many_need = diff_component // 5000
-                    component_sizing = 'шт'
+                    # component_sizing = 'шт'
                 if how_many_need != 0:
+                    component_sizing = 'шт'
                     compile_string += f'\t{component_name}: {how_many_need} {component_sizing}\n'
 
             compile_string += f"{'-' * 10}\n"
+        LOGGER.debug('Отправлены данные о недостающих ингредиентах.')
         return compile_string
 
     def show_ingredients(self):
@@ -237,7 +234,7 @@ class TelemetronRequests:
             for ingredient in item['data']:
                 compile_string += f'{ingredient["component_name"]}: {ingredient["loading_value"]}/{ingredient["capacity_value"]} {ingredient["component_sizing"]}\n'
             compile_string += f"{'-' * 10}\n"
-
+        LOGGER.debug('Отправлены данные о загрузке ингредиентов.')
         return compile_string
 
 
